@@ -114,21 +114,43 @@ void my_main() {
       {
         case PUSH:
           printf("Push");
+          push(systems);
           break;
         case POP:
           printf("Pop");
+          pop(systems);
           break;
         case MOVE:
           printf("Move");
+          tmp = make_translate(op[i].op.move.d[0],op[i].op.move.d[1], op[i].op.move.d[2]);
+          matrix_mult(peek(systems), tmp);
+          copy_matrix(tmp, peek(systems));
           break;
         case ROTATE:
           printf("Rotate");
+          theta = op[i].op.rotate.degrees * (M_PI / 180);
+          if (op[i].op.rotate.axis == 'x')
+            tmp = make_rotX(theta);
+          else if (op[i].op.rotate.axis == 'y')
+            tmp = make_rotY(theta);
+          else
+            tmp = make_rotZ(theta);
+
+          matrix_mult(peek(systems), tmp);
+          copy_matrix(tmp, peek(systems));
           break;
         case SCALE:
           printf("Scale");
+          tmp = make_scale(op[i].op.scale.d[0],op[i].op.scale.d[1], op[i].op.scale.d[2]);
+          matrix_mult(peek(systems), tmp);
+          copy_matrix(tmp, peek(systems));
           break;
         case BOX:
           printf("Box");
+          add_box(tmp, op[i].op.box.d0[0],op[i].op.box.d0[1], op[i].op.box.d0[2], op[i].op.box.d1[0],op[i].op.box.d1[1], op[i].op.box.d1[2]);
+          matrix_mult(peek(systems), tmp);
+          draw_polygons(tmp, t, zb, g, view, light, ambient, areflect, dreflect, sreflect);
+          tmp->lastcol = 0;
           break;
         case SPHERE:
           printf("Sphere");

@@ -110,7 +110,45 @@ void my_main() {
   for (i=0;i<lastop;i++) {
 
     printf("%d: ",i);
-
+    switch (op[i].opcode)
+      {
+        case PUSH:
+          printf("Push");
+          break;
+        case POP:
+          printf("Pop");
+          break;
+        case MOVE:
+          printf("Move");
+          break;
+        case ROTATE:
+          printf("Rotate");
+          break;
+        case SCALE:
+          printf("Scale");
+          break;
+        case BOX:
+          printf("Box");
+          break;
+        case SPHERE:
+          printf("Sphere");
+          break;
+        case TORUS:
+          printf("Torus");
+          break;
+        case CONSTANTS:
+          printf("Constants");
+          break;
+        case LINE:
+          printf("Line");
+          break;
+        case SAVE:
+          printf("Save");
+          break;
+        case DISPLAY:
+          printf("Display");
+          break;
+        }
     printf("\n");
   }
 }

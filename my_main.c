@@ -53,6 +53,8 @@ void my_main() {
 
   int i;
   struct matrix *tmp;
+  struct matrix *edges;
+  struct matrix *polygons;
   struct stack *systems;
   screen t;
   zbuffer zb;
@@ -100,6 +102,8 @@ void my_main() {
 
   systems = new_stack();
   tmp = new_matrix(4, 1000);
+  polygons = new_matrix(4, 4);
+  edges = new_matrix(4, 4);
   clear_screen( t );
   clear_zbuffer(zb);
   g.red = 0;
@@ -149,26 +153,49 @@ void my_main() {
           printf("Box");
           add_box(tmp, op[i].op.box.d0[0],op[i].op.box.d0[1], op[i].op.box.d0[2], op[i].op.box.d1[0],op[i].op.box.d1[1], op[i].op.box.d1[2]);
           matrix_mult(peek(systems), tmp);
-          draw_polygons(tmp, t, zb, g, view, light, ambient, areflect, dreflect, sreflect);
+          if (op[i].op.box.constants != NULL) {
+            reflect = op[i].op.box.constants->s.c;
+          }      
+          draw_polygons(tmp, t, zb, view, light, ambient, reflect); 
           tmp->lastcol = 0;
           break;
         case SPHERE:
           printf("Sphere");
+          add_sphere(tmp, op[i].op.sphere.d[0],op[i].op.sphere.d[1], op[i].op.sphere.d[2], op[i].op.sphere.r, step_3d);
+          matrix_mult(peek(systems), tmp);
+          if (op[i].op.sphere.constants != NULL) {
+            reflect = op[i].op.sphere.constants->s.c;
+          }
+          draw_polygons(tmp, t, zb, view, light, ambient, reflect);
+          tmp->lastcol = 0;
           break;
         case TORUS:
           printf("Torus");
+          add_torus(tmp, op[i].op.torus.d[0],op[i].op.torus.d[1], op[i].op.torus.d[2], op[i].op.torus.r0,op[i].op.torus.r1, step_3d);
+          matrix_mult(peek(systems), tmp);
+          if (op[i].op.torus.constants != NULL) {
+            reflect = op[i].op.torus.constants->s.c;
+          }      
+          draw_polygons(tmp, t, zb, view, light, ambient, reflect);
+          tmp->lastcol = 0;
           break;
         case CONSTANTS:
           printf("Constants");
           break;
         case LINE:
           printf("Line");
+          add_edge(tmp, op[i].op.line.p0[0],op[i].op.line.p0[1], op[i].op.line.p0[1], op[i].op.line.p1[0],op[i].op.line.p1[1], op[i].op.line.p1[1]);
+          matrix_mult(peek(systems), tmp);
+          draw_lines(tmp, t, zb, g);
+          tmp->lastcol = 0;
           break;
         case SAVE:
           printf("Save");
+          save_extension(t, op[i].op.save.p->name);
           break;
         case DISPLAY:
           printf("Display");
+          display(t);
           break;
         }
     printf("\n");

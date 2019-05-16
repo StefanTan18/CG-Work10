@@ -59,7 +59,7 @@ void my_main() {
   screen t;
   zbuffer zb;
   color g;
-  double step_3d = 20;
+  double step_3d = 200;
   double theta;
 
   //Lighting values here for easy access
@@ -73,7 +73,7 @@ void my_main() {
   light[LOCATION][1] = 0.75;
   light[LOCATION][2] = 1;
 
-  light[COLOR][RED] = 0;
+  light[COLOR][RED] = 255;
   light[COLOR][GREEN] = 255;
   light[COLOR][BLUE] = 255;
 
@@ -133,9 +133,9 @@ void my_main() {
         case ROTATE:
           printf("Rotate");
           theta = op[i].op.rotate.degrees * (M_PI / 180);
-          if (op[i].op.rotate.axis == 'x')
+          if (op[i].op.rotate.axis == 0.0)
             tmp = make_rotX(theta);
-          else if (op[i].op.rotate.axis == 'y')
+          else if (op[i].op.rotate.axis == 1.0)
             tmp = make_rotY(theta);
           else
             tmp = make_rotZ(theta);
@@ -151,43 +151,46 @@ void my_main() {
           break;
         case BOX:
           printf("Box");
-          add_box(tmp, op[i].op.box.d0[0],op[i].op.box.d0[1], op[i].op.box.d0[2], op[i].op.box.d1[0],op[i].op.box.d1[1], op[i].op.box.d1[2]);
-          matrix_mult(peek(systems), tmp);
+          add_box(polygons, op[i].op.box.d0[0],op[i].op.box.d0[1], op[i].op.box.d0[2], op[i].op.box.d1[0],op[i].op.box.d1[1], op[i].op.box.d1[2]);
+          matrix_mult(peek(systems), polygons);
+          reflect = &white;
           if (op[i].op.box.constants != NULL) {
             reflect = op[i].op.box.constants->s.c;
-          }      
-          draw_polygons(tmp, t, zb, view, light, ambient, reflect); 
-          tmp->lastcol = 0;
+          }
+          draw_polygons(polygons, t, zb, view, light, ambient, reflect);
+          polygons->lastcol = 0;
           break;
         case SPHERE:
           printf("Sphere");
-          add_sphere(tmp, op[i].op.sphere.d[0],op[i].op.sphere.d[1], op[i].op.sphere.d[2], op[i].op.sphere.r, step_3d);
-          matrix_mult(peek(systems), tmp);
+          add_sphere(polygons, op[i].op.sphere.d[0],op[i].op.sphere.d[1], op[i].op.sphere.d[2], op[i].op.sphere.r, step_3d);
+          matrix_mult(peek(systems), polygons);
+          reflect = &white;
           if (op[i].op.sphere.constants != NULL) {
             reflect = op[i].op.sphere.constants->s.c;
           }
-          draw_polygons(tmp, t, zb, view, light, ambient, reflect);
-          tmp->lastcol = 0;
+          draw_polygons(polygons, t, zb, view, light, ambient, reflect);
+          polygons->lastcol = 0;
           break;
         case TORUS:
           printf("Torus");
-          add_torus(tmp, op[i].op.torus.d[0],op[i].op.torus.d[1], op[i].op.torus.d[2], op[i].op.torus.r0,op[i].op.torus.r1, step_3d);
-          matrix_mult(peek(systems), tmp);
+          add_torus(polygons, op[i].op.torus.d[0],op[i].op.torus.d[1], op[i].op.torus.d[2], op[i].op.torus.r0,op[i].op.torus.r1, step_3d);
+          matrix_mult(peek(systems), polygons);
+          reflect = &white;
           if (op[i].op.torus.constants != NULL) {
             reflect = op[i].op.torus.constants->s.c;
-          }      
-          draw_polygons(tmp, t, zb, view, light, ambient, reflect);
-          tmp->lastcol = 0;
+          }
+          draw_polygons(polygons, t, zb, view, light, ambient, reflect);
+          polygons->lastcol = 0;
           break;
         case CONSTANTS:
           printf("Constants");
           break;
         case LINE:
           printf("Line");
-          add_edge(tmp, op[i].op.line.p0[0],op[i].op.line.p0[1], op[i].op.line.p0[1], op[i].op.line.p1[0],op[i].op.line.p1[1], op[i].op.line.p1[1]);
-          matrix_mult(peek(systems), tmp);
-          draw_lines(tmp, t, zb, g);
-          tmp->lastcol = 0;
+          add_edge(edges, op[i].op.line.p0[0],op[i].op.line.p0[1], op[i].op.line.p0[1], op[i].op.line.p1[0],op[i].op.line.p1[1], op[i].op.line.p1[1]);
+          matrix_mult(peek(systems), edges);
+          draw_lines(edges, t, zb, g);
+          edges->lastcol = 0;
           break;
         case SAVE:
           printf("Save");
